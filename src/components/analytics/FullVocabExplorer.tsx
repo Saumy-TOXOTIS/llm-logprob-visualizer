@@ -6,7 +6,7 @@ import { Conversation, FullVocabAlternative, FullVocabSnapshot, Message, Message
 import { fetchFullVocabSnapshot, getLlamaCppModelMeta } from '@/lib/llamacpp/api';
 import { db } from '@/lib/db';
 import { formatPercent } from '@/lib/utils';
-import { Activity, DatabaseZap, GitBranch, Loader2, Search, Sparkles, Split, Zap } from 'lucide-react';
+import { Activity, Clipboard, DatabaseZap, GitBranch, Loader2, Search, Sparkles, Split, TrendingDown, Zap } from 'lucide-react';
 
 type Props = {
   conversation: Conversation;
@@ -25,6 +25,79 @@ function formatMass(value: number) {
   return `${Math.min(100, value * 100).toFixed(2)}%`;
 }
 
+function formatTokenPercent(value?: number) {
+  if (value === undefined) return 'root';
+  if (value === 0) return '0%';
+  if (value < 0.0001) return '<0.01%';
+  return formatPercent(value);
+}
+
+function pathCumulativeProbability(path: FullVocabSnapshot[]) {
+  return path.reduce((acc, snapshot) => acc * Math.max(snapshot.selectedTokenProbability ?? 1, 1e-12), 1);
+}
+
+function TreeNode({
+  node,
+  childrenByParent,
+  activeSnapshotId,
+  onSelect,
+  depth = 0,
+}: {
+  node: FullVocabSnapshot;
+  childrenByParent: Map<string, FullVocabSnapshot[]>;
+  activeSnapshotId: string | null;
+  onSelect: (id: string) => void;
+  depth?: number;
+}) {
+  const children = childrenByParent.get(node.id) || [];
+  const isActive = node.id === activeSnapshotId;
+  const label = node.selectedToken ? tokenLabel(node.selectedToken) : 'Root scan';
+  const probability = node.selectedTokenProbability;
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => onSelect(node.id)}
+        className={`group w-full rounded-2xl border p-3 text-left transition ${
+          isActive
+            ? 'border-[#d97757]/40 bg-[#d97757]/10 shadow-[0_12px_32px_rgba(201,100,66,0.12)]'
+            : 'border-stone-200 bg-white hover:border-[#d97757]/25 hover:bg-[#fffaf2]'
+        }`}
+        style={{ marginLeft: depth ? 18 : 0 }}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="font-mono text-sm text-stone-950 truncate">"{label}"</div>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] font-mono text-stone-500">
+              <span>p {formatTokenPercent(probability)}</span>
+              <span>entropy {node.entropy.toFixed(2)}</span>
+              <span>{node.alternatives.length.toLocaleString()} candidates</span>
+            </div>
+          </div>
+          <div className="rounded-xl border border-stone-200 bg-stone-50 px-2 py-1 text-[10px] font-mono text-stone-500">
+            {children.length} child{children.length === 1 ? '' : 'ren'}
+          </div>
+        </div>
+      </button>
+      {children.length > 0 && (
+        <div className="relative mt-2 space-y-2 before:absolute before:left-[10px] before:top-0 before:bottom-0 before:w-px before:bg-stone-200">
+          {children.map(child => (
+            <div key={child.id} className="relative before:absolute before:left-[10px] before:top-6 before:w-5 before:h-px before:bg-stone-200">
+              <TreeNode
+                node={child}
+                childrenByParent={childrenByParent}
+                activeSnapshotId={activeSnapshotId}
+                onSelect={onSelect}
+                depth={depth + 1}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function FullVocabExplorer({ conversation, message, variant }: Props) {
   const [snapshots, setSnapshots] = useState<FullVocabSnapshot[]>([]);
   const [activeSnapshotId, setActiveSnapshotId] = useState<string | null>(null);
@@ -40,6 +113,39 @@ export function FullVocabExplorer({ conversation, message, variant }: Props) {
   const activeSnapshot = snapshots.find(s => s.id === activeSnapshotId) || snapshots[0] || null;
   const fullTarget = modelMeta?.nVocab || activeSnapshot?.nVocab || conversation.settings.fullVocabNProbs || 0;
   const isBusy = status === 'loading-meta' || status === 'scanning' || status === 'expanding';
+
+  const childrenByParent = useMemo(() => {
+    const map = new Map<string, FullVocabSnapshot[]>();
+    snapshots.forEach(snapshot => {
+      if (!snapshot.parentId) return;
+      const current = map.get(snapshot.parentId) || [];
+      current.push(snapshot);
+      current.sort((a, b) => (b.selectedTokenProbability || 0) - (a.selectedTokenProbability || 0));
+      map.set(snapshot.parentId, current);
+    });
+    return map;
+  }, [snapshots]);
+
+  const rootSnapshots = useMemo(
+    () => snapshots.filter(snapshot => !snapshot.parentId).sort((a, b) => a.createdAt - b.createdAt),
+    [snapshots]
+  );
+
+  const activePath = useMemo(() => {
+    if (!activeSnapshot) return [];
+    const byId = new Map(snapshots.map(snapshot => [snapshot.id, snapshot]));
+    const path: FullVocabSnapshot[] = [];
+    let cursor: FullVocabSnapshot | undefined = activeSnapshot;
+    while (cursor) {
+      path.unshift(cursor);
+      cursor = cursor.parentId ? byId.get(cursor.parentId) : undefined;
+    }
+    return path;
+  }, [activeSnapshot, snapshots]);
+
+  const cumulativeProbability = useMemo(() => pathCumulativeProbability(activePath), [activePath]);
+  const timelinePoints = activePath.filter(snapshot => snapshot.selectedTokenProbability !== undefined);
+  const topNextAlternatives = activeSnapshot?.alternatives.slice(0, 5) || [];
 
   const filteredAlternatives = useMemo(() => {
     if (!activeSnapshot) return [];
@@ -135,6 +241,10 @@ export function FullVocabExplorer({ conversation, message, variant }: Props) {
   const totalCandidates = activeSnapshot?.alternatives.length || 0;
   const hiddenCount = activeSnapshot ? Math.max(0, activeSnapshot.nVocab - activeSnapshot.alternatives.length) : 0;
   const virtualItems = rowVirtualizer.getVirtualItems();
+  const copyBranchPath = () => {
+    const text = activeSnapshot?.generatedPrefix || '';
+    navigator.clipboard.writeText(text);
+  };
 
   return (
     <div className="flex flex-col gap-5">
@@ -231,6 +341,144 @@ export function FullVocabExplorer({ conversation, message, variant }: Props) {
           </div>
         </div>
       </div>
+
+      {snapshots.length > 0 && (
+        <div className="grid grid-cols-1 2xl:grid-cols-[0.95fr_1.05fr] gap-4">
+          <div className="premium-card p-5">
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] font-bold text-[#9a3412]">
+                  <GitBranch className="w-4 h-4" />
+                  Branch Tree Map
+                </div>
+                <p className="text-sm text-stone-500 mt-1">Every expanded token becomes a navigable decision node.</p>
+              </div>
+              <div className="rounded-2xl border border-stone-200 bg-stone-50 px-3 py-2 text-right">
+                <div className="text-[10px] uppercase tracking-[0.14em] text-stone-500">Nodes</div>
+                <div className="font-mono text-stone-950">{snapshots.length}</div>
+              </div>
+            </div>
+            <div className="max-h-[420px] overflow-auto custom-scrollbar rounded-3xl border border-stone-200 bg-stone-50/60 p-3 space-y-2">
+              {rootSnapshots.map(root => (
+                <TreeNode
+                  key={root.id}
+                  node={root}
+                  childrenByParent={childrenByParent}
+                  activeSnapshotId={activeSnapshotId}
+                  onSelect={setActiveSnapshotId}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="premium-card p-5">
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] font-bold text-[#9a3412]">
+                  <TrendingDown className="w-4 h-4" />
+                  Probability Timeline
+                </div>
+                <p className="text-sm text-stone-500 mt-1">Tracks confidence decay as you force a branch token by token.</p>
+              </div>
+              <button
+                onClick={copyBranchPath}
+                disabled={!activeSnapshot?.generatedPrefix}
+                className="ripple-button rounded-2xl border border-stone-200 bg-white px-3 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-50 disabled:opacity-50 flex items-center gap-2"
+              >
+                <Clipboard className="w-3.5 h-3.5" />
+                Copy Path
+              </button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 mb-4 text-center">
+              <div className="rounded-2xl border border-stone-200 bg-stone-50 p-3">
+                <div className="text-[10px] uppercase text-stone-500">Depth</div>
+                <div className="font-mono text-stone-950">{timelinePoints.length}</div>
+              </div>
+              <div className="rounded-2xl border border-stone-200 bg-stone-50 p-3">
+                <div className="text-[10px] uppercase text-stone-500">Path Probability</div>
+                <div className="font-mono text-stone-950">{formatTokenPercent(cumulativeProbability)}</div>
+              </div>
+              <div className="rounded-2xl border border-stone-200 bg-stone-50 p-3">
+                <div className="text-[10px] uppercase text-stone-500">Active Entropy</div>
+                <div className="font-mono text-stone-950">{activeSnapshot?.entropy.toFixed(2) || '0.00'}</div>
+              </div>
+            </div>
+
+            {timelinePoints.length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-stone-300 bg-stone-50 p-8 text-center text-sm text-stone-500">
+                Expand a token to start the probability timeline.
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-[350px] overflow-auto custom-scrollbar pr-1">
+                {timelinePoints.map((snapshot, index) => {
+                  const runningPath = activePath.slice(0, activePath.indexOf(snapshot) + 1);
+                  const runningProbability = pathCumulativeProbability(runningPath);
+                  const probability = snapshot.selectedTokenProbability || 0;
+                  return (
+                    <button
+                      key={snapshot.id}
+                      onClick={() => setActiveSnapshotId(snapshot.id)}
+                      className={`w-full rounded-2xl border p-3 text-left transition ${
+                        snapshot.id === activeSnapshotId
+                          ? 'border-[#d97757]/40 bg-[#d97757]/10'
+                          : 'border-stone-200 bg-white hover:border-[#d97757]/25'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="rounded-lg bg-stone-100 border border-stone-200 px-2 py-1 text-[10px] font-mono text-stone-500">
+                              step {index + 1}
+                            </span>
+                            <span className="font-mono text-sm text-stone-950 truncate">
+                              "{tokenLabel(snapshot.selectedToken || '')}"
+                            </span>
+                          </div>
+                          <div className="mt-2 h-2 rounded-full bg-stone-100 border border-stone-200 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-gradient-to-r from-[#d97757] to-[#8f5f46]"
+                              style={{ width: `${Math.max(2, Math.min(100, probability * 100))}%` }}
+                            />
+                          </div>
+                          <div className="mt-1 flex flex-wrap gap-3 text-[10px] font-mono text-stone-500">
+                            <span>selected p {formatTokenPercent(probability)}</span>
+                            <span>cumulative {formatTokenPercent(runningProbability)}</span>
+                            <span>entropy after token {snapshot.entropy.toFixed(2)}</span>
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <div className="text-[10px] uppercase tracking-[0.14em] text-stone-500">token id</div>
+                          <div className="font-mono text-xs text-stone-900">{snapshot.selectedTokenId ?? 'n/a'}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {topNextAlternatives.length > 0 && (
+              <div className="mt-4 rounded-3xl border border-stone-200 bg-stone-50 p-3">
+                <div className="text-[10px] uppercase tracking-[0.16em] font-bold text-stone-500 mb-2">Top next moves from active node</div>
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+                  {topNextAlternatives.map(alt => (
+                    <button
+                      key={`${alt.rank}-${alt.id}-${alt.token}`}
+                      onClick={() => expandAlternative(alt)}
+                      disabled={isBusy}
+                      className="rounded-2xl border border-stone-200 bg-white hover:border-[#d97757]/30 p-2 text-left transition disabled:opacity-50"
+                    >
+                      <div className="font-mono text-xs text-stone-950 truncate">"{tokenLabel(alt.token)}"</div>
+                      <div className="text-[10px] font-mono text-stone-500 mt-1">{formatPercent(alt.probability)}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="premium-card p-4">
         <div className="flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
