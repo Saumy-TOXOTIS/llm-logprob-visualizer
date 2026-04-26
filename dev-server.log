@@ -1,0 +1,14 @@
+
+> llm-logprob-visualizer@0.1.0 dev
+> next dev -p 3000
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+ ✓ Ready in 2.6s
+ ○ Compiling /api/llamacpp ...
+ ✓ Compiled /api/llamacpp in 658ms (56 modules)
+ POST /api/llamacpp 200 in 1356ms
+ POST /api/llamacpp 200 in 563ms
+ POST /api/llamacpp 200 in 22ms

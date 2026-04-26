@@ -3,25 +3,137 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #f7f3ea;
+  --foreground: #2b2926;
+  --surface: rgba(255, 252, 246, 0.86);
+  --border: rgba(86, 72, 55, 0.16);
+  --accent-blue: #c96442;
+  --accent-violet: #8f5f46;
+  --success: #22c55e;
+  --warning: #c9891f;
+  --danger: #b94a48;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-image:
+    radial-gradient(circle at 15% -10%, rgba(201, 100, 66, 0.12) 0%, transparent 32%),
+    radial-gradient(circle at 92% 4%, rgba(143, 95, 70, 0.10) 0%, transparent 30%),
+    linear-gradient(180deg, #fbf7ef 0%, #f3ecdf 100%);
+  background-attachment: fixed;
+  font-family: inherit;
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .glass-panel {
+    @apply bg-surface backdrop-blur-glass border border-border shadow-glass rounded-2xl;
   }
+
+  .premium-card {
+    @apply border border-stone-200 bg-white/80 shadow-[0_12px_36px_rgba(69,52,32,0.08)] backdrop-blur-xl rounded-2xl;
+  }
+
+  .neural-border {
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.55),
+      0 0 0 1px rgba(109,79,48,0.04),
+      0 10px 30px rgba(69,52,32,0.08);
+  }
+
+  .glow-text {
+    text-shadow: none;
+  }
+
+  .ripple-button {
+    @apply relative overflow-hidden transition-all duration-200;
+  }
+
+  .ripple-button::after {
+    content: "";
+    position: absolute;
+    inset: auto auto 50% 50%;
+    width: 0;
+    height: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    transform: translate(-50%, 50%);
+    transition: width 280ms ease, height 280ms ease, opacity 420ms ease;
+    opacity: 0;
+  }
+
+  .ripple-button:active::after {
+    width: 180px;
+    height: 180px;
+    opacity: 1;
+    transition: 0s;
+  }
+
+  .animate-in-soft {
+    animation: softIn 360ms ease both;
+  }
+
+  .token-fade-in {
+    animation: tokenIn 260ms ease both;
+  }
+
+  .premium-range {
+    accent-color: var(--accent-blue);
+  }
+
+  .premium-range::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(56,189,248,0.42), rgba(139,92,246,0.35));
+    box-shadow: 0 0 18px rgba(56,189,248,0.12);
+  }
+
+  .premium-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    margin-top: -5px;
+    border-radius: 999px;
+    background: #dff8ff;
+    border: 2px solid rgba(56,189,248,0.75);
+    box-shadow: 0 0 18px rgba(56,189,248,0.55);
+  }
+}
+
+@keyframes softIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tokenIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(86, 72, 55, 0.08); 
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(86, 72, 55, 0.22); 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(86, 72, 55, 0.34); 
 }
