@@ -150,7 +150,7 @@ This tool provides an **approximation of the model's decision space**.
 ## 🛠️ Setup
 
 ```bash
-git clone <your-repo>
-cd <your-repo>
+git clone "https://github.com/Saumy-TOXOTIS/llm-logprob-visualizer.git"
+cd llm-logprob-visualizer
 npm install
 npm run dev
