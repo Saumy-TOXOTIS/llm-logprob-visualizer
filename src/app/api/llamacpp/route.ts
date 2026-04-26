@@ -46,6 +46,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(data);
   } catch (error: any) {
     console.error('llama.cpp proxy error:', error);
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    const message = error.message === 'fetch failed'
+      ? 'Could not reach llama.cpp server. Make sure llama-server.exe is running on the configured base URL, usually http://127.0.0.1:8080.'
+      : error.message || 'Internal Server Error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

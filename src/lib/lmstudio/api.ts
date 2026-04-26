@@ -1,5 +1,6 @@
 import { Conversation, ChatSettings, ImageAttachment } from '@/types';
 import { parseLmStudioResponse, buildTokenStats } from './parser';
+import { sendMessageToLlamaCpp } from '@/lib/llamacpp/api';
 
 // Build a multimodal content array for a user message with images
 function buildMultimodalContent(
@@ -36,6 +37,10 @@ export async function sendMessageToLmStudio(
   newMessage: string,
   settings: ChatSettings
 ) {
+  if (settings.inferenceProvider === 'llamacpp') {
+    return sendMessageToLlamaCpp(conversation, newMessage, settings);
+  }
+
   // Construct the input array
   const input: any[] = [];
 

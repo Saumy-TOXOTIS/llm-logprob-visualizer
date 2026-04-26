@@ -192,6 +192,36 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
             <label className="text-xs uppercase tracking-[0.18em] font-semibold text-zinc-500 flex items-center gap-2 mb-2 pb-2">
               <Server className="w-4 h-4" /> Endpoint configuration
             </label>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.045] p-3">
+              <label className="block text-sm text-zinc-300 mb-2">Active Inference Provider</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setLocal({...local, inferenceProvider: 'lmstudio'})}
+                  className={`rounded-xl border px-4 py-3 text-left transition ${
+                    (local.inferenceProvider || 'lmstudio') === 'lmstudio'
+                      ? 'border-sky-400/40 bg-sky-400/15 text-sky-100'
+                      : 'border-white/10 bg-black/20 text-zinc-400 hover:text-zinc-100'
+                  }`}
+                >
+                  <div className="text-sm font-semibold">LM Studio</div>
+                  <div className="text-[11px] opacity-70">Chat via base URL + endpoint path</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLocal({...local, inferenceProvider: 'llamacpp'})}
+                  className={`rounded-xl border px-4 py-3 text-left transition ${
+                    local.inferenceProvider === 'llamacpp'
+                      ? 'border-[#d97757]/50 bg-[#d97757]/15 text-orange-100'
+                      : 'border-white/10 bg-black/20 text-zinc-400 hover:text-zinc-100'
+                  }`}
+                >
+                  <div className="text-sm font-semibold">llama.cpp</div>
+                  <div className="text-[11px] opacity-70">Chat + universe via llama-server</div>
+                </button>
+              </div>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>

@@ -8,13 +8,18 @@ import { BrainCircuit, Cpu, Flame, Gauge, HardDrive, Server, Target } from 'luci
 
 function ModelIdentityBar() {
   const { globalSettings } = useChatStore();
-  const modelName = globalSettings.model || 'Unknown model';
-  const provider = globalSettings.baseUrl?.includes('localhost') || globalSettings.baseUrl?.includes('127.0.0.1')
-    ? 'LM Studio Local'
-    : 'Custom Provider';
+  const isLlamaCpp = globalSettings.inferenceProvider === 'llamacpp';
+  const modelName = isLlamaCpp
+    ? (globalSettings.llamaCppModelAlias || globalSettings.model || 'qwen3.5-9b')
+    : (globalSettings.model || 'Unknown model');
+  const provider = isLlamaCpp
+    ? 'llama.cpp Local'
+    : globalSettings.baseUrl?.includes('localhost') || globalSettings.baseUrl?.includes('127.0.0.1')
+      ? 'LM Studio Local'
+      : 'Custom Provider';
 
   const badges = [
-    { label: provider, value: globalSettings.baseUrl || 'offline', icon: Server, tone: 'text-stone-700 border-stone-200 bg-white/65' },
+    { label: provider, value: isLlamaCpp ? (globalSettings.llamaCppBaseUrl || 'http://127.0.0.1:8080') : (globalSettings.baseUrl || 'offline'), icon: Server, tone: 'text-stone-700 border-stone-200 bg-white/65' },
     { label: 'Quantization', value: 'Q4', icon: HardDrive, tone: 'text-stone-700 border-stone-200 bg-white/65' },
     { label: 'Device', value: 'CPU/GPU', icon: Cpu, tone: 'text-stone-700 border-stone-200 bg-white/65' },
     { label: 'Temp', value: globalSettings.temperature.toFixed(2), icon: Flame, tone: 'text-[#9a3412] border-[#d97757]/20 bg-[#d97757]/10' },

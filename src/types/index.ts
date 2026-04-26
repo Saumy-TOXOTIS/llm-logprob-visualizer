@@ -10,6 +10,7 @@ export interface ImageAttachment {
 }
 
 export interface GenerationSettings {
+  inferenceProvider?: 'lmstudio' | 'llamacpp';
   baseUrl: string;
   endpointPath: string;
   model: string;

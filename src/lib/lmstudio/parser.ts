@@ -72,6 +72,19 @@ export function parseLmStudioResponse(rawResponse: any, settings?: import('@/typ
       }
     }
   }
+  else if (typeof rawResponse.content === 'string') {
+    fullText = rawResponse.content;
+    finishReason = rawResponse.stop_type || rawResponse.stop ? 'stop' : undefined;
+    rawOutputTypes.push('llama.cpp.completion');
+
+    if (Array.isArray(rawResponse.completion_probabilities)) {
+      fullRawTokens = rawResponse.completion_probabilities.map((item: any) => ({
+        token: item.token,
+        logprob: item.logprob,
+        top_logprobs: item.top_logprobs || []
+      }));
+    }
+  }
 
   // Strict closing-marker-first detection as defined by user acceptance criteria
   const closingMarkers = [

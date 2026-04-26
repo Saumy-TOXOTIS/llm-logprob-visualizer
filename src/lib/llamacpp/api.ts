@@ -1,6 +1,7 @@
 import { ChatSettings, Conversation, FullVocabAlternative, FullVocabSnapshot, Message, MessageVariant } from '@/types';
 import { classifySafety } from '@/lib/analytics/safety';
 import { generateId } from '@/lib/utils';
+import { buildTokenStats, parseLmStudioResponse } from '@/lib/lmstudio/parser';
 
 type LlamaMessage = {
   role: 'system' | 'user' | 'assistant';
@@ -87,6 +88,78 @@ export async function applyLlamaTemplate(settings: ChatSettings, messages: Llama
   const baseUrl = settings.llamaCppBaseUrl || 'http://127.0.0.1:8080';
   const data = await callLlamaCpp(baseUrl, '/apply-template', { messages });
   return String(data.prompt || '');
+}
+
+export function buildLlamaChatMessages(conversation: Conversation, settings: ChatSettings): LlamaMessage[] {
+  const messages: LlamaMessage[] = [];
+  if (settings.systemPrompt) {
+    messages.push({ role: 'system', content: settings.systemPrompt });
+  }
+
+  conversation.messages.forEach(msg => {
+    if (msg.status === 'error' || msg.status === 'generating' || msg.role === 'system') return;
+
+    if (msg.role === 'user') {
+      messages.push({ role: 'user', content: msg.content });
+      return;
+    }
+
+    const activeVariant = msg.variants?.find(v => v.id === msg.activeVariantId) || msg.variants?.[0];
+    const content = settings.includeReasoningInContext
+      ? activeVariant?.content || msg.content
+      : activeVariant?.finalText || activeVariant?.content || msg.content;
+
+    if (content) {
+      messages.push({ role: 'assistant', content });
+    }
+  });
+
+  return messages;
+}
+
+export async function sendMessageToLlamaCpp(
+  conversation: Conversation,
+  newMessage: string,
+  settings: ChatSettings
+) {
+  const baseUrl = settings.llamaCppBaseUrl || 'http://127.0.0.1:8080';
+  const messages = buildLlamaChatMessages(conversation, settings);
+  const prompt = await applyLlamaTemplate(settings, messages);
+
+  const payload: any = {
+    prompt,
+    n_predict: settings.max_output_tokens || 2048,
+    temperature: settings.temperature,
+    top_p: settings.top_p,
+    stream: false,
+    cache_prompt: true,
+    return_tokens: true,
+    post_sampling_probs: false,
+    n_probs: Math.max(0, settings.top_logprobs || 0)
+  };
+
+  if (settings.top_k !== undefined) payload.top_k = settings.top_k;
+  if (settings.min_p !== undefined) payload.min_p = settings.min_p;
+  if (settings.presence_penalty !== undefined) payload.presence_penalty = settings.presence_penalty;
+  if (settings.frequency_penalty !== undefined) payload.frequency_penalty = settings.frequency_penalty;
+  if (settings.repeat_penalty !== undefined) payload.repeat_penalty = settings.repeat_penalty;
+  if (settings.seed !== undefined) payload.seed = settings.seed;
+  if (settings.stop && settings.stop.length > 0) payload.stop = settings.stop;
+
+  const rawJson = await callLlamaCpp(baseUrl, '/completion', payload);
+  const parsed = parseLmStudioResponse(rawJson, settings);
+  const finalStats = buildTokenStats(parsed.finalTokens);
+  const reasoningStats = buildTokenStats(parsed.reasoningTokens);
+
+  return {
+    rawResponse: rawJson,
+    parsedOutput: parsed,
+    stats: finalStats,
+    reasoningStats,
+    settingsUsed: settings,
+    sentContent: newMessage,
+    requestPayload: payload
+  };
 }
 
 export async function fetchFullVocabSnapshot({

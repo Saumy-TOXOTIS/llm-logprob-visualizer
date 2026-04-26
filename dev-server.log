@@ -12,3 +12,4 @@
  POST /api/llamacpp 200 in 1356ms
  POST /api/llamacpp 200 in 563ms
  POST /api/llamacpp 200 in 22ms
+ ✓ Compiled in 179ms

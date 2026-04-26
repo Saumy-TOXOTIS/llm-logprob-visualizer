@@ -37,6 +37,7 @@ interface ChatState {
 }
 
 export const DEFAULT_SETTINGS: ChatSettings = {
+  inferenceProvider: 'lmstudio',
   baseUrl: 'http://localhost:1234',
   endpointPath: '/v1/responses',
   model: 'qwen/qwen3.5-9b',
