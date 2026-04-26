@@ -218,7 +218,7 @@ export function MessageList({ messages, isGenerating, onContinue }: MessageListP
         onScroll={checkScroll}
         className="flex-1 overflow-y-auto p-4 scroll-smooth"
       >
-        <div className="max-w-4xl mx-auto space-y-6 pb-4">
+        <div className="max-w-4xl mx-auto space-y-5 pb-4">
           {messages.filter(m => m.status !== 'generating').map((message) => {
             const isUser = message.role === 'user';
             const activeVariant = message.variants?.find(v => v.id === message.activeVariantId) || message.variants?.[0];
@@ -232,23 +232,23 @@ export function MessageList({ messages, isGenerating, onContinue }: MessageListP
             return (
               <div 
                 key={message.id} 
-                className={`flex gap-4 max-w-4xl mx-auto w-full ${isUser ? 'flex-row-reverse' : ''}`}
+                className={`flex gap-3 max-w-4xl mx-auto w-full ${isUser ? 'flex-row-reverse' : ''}`}
               >
                 <div className="shrink-0 flex items-start mt-2">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm ${
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center border shadow-sm ${
                     isUser 
-                      ? 'bg-[#f1e5d5] border-stone-200 text-[#9a3412]' 
+                      ? 'bg-[#efe4d4] border-stone-200 text-[#8f3d20]' 
                       : message.status === 'error'
                         ? 'bg-red-500/10 border-red-500/30 text-red-500'
-                        : 'bg-[#f1e5d5] border-stone-200 text-[#9a3412]'
+                        : 'bg-[#efe4d4] border-stone-200 text-[#8f3d20]'
                   }`}>
-                    {isUser ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
+                    {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
                   </div>
                 </div>
                 <div className={`flex-1 max-w-full lg:max-w-[88%] ${isUser ? 'text-right' : ''}`}>
-                  <div className={`inline-block p-4 rounded-2xl text-sm leading-relaxed text-left w-full ${
+                  <div className={`inline-block p-3.5 rounded-xl text-sm leading-relaxed text-left w-full ${
                     isUser 
-                      ? 'bg-[#fffaf2] border border-stone-200 text-stone-900 rounded-tr-none w-auto shadow-[0_12px_32px_rgba(69,52,32,0.07)]' 
+                      ? 'bg-[#fffaf2]/90 border border-stone-200/90 text-stone-900 rounded-tr-none w-auto shadow-[0_8px_22px_rgba(69,52,32,0.055)]' 
                       : 'bg-transparent p-0'
                   }`}>
                     {isUser ? (
@@ -261,11 +261,11 @@ export function MessageList({ messages, isGenerating, onContinue }: MessageListP
                         <div className="mt-4 pt-3 border-t border-stone-200 flex flex-wrap items-center gap-2 text-[11px] text-stone-500">
                           <span
                             title="Estimated input tokens"
-                            className="px-2.5 py-1 rounded-full bg-[#f1e5d5] border border-stone-200 text-stone-700 font-mono"
+                            className="px-2.5 py-0.5 rounded-full bg-[#efe4d4] border border-stone-200 text-stone-700 font-mono"
                           >
                             {userTokenEstimate} tokens
                           </span>
-                          <span className="px-2.5 py-1 rounded-full bg-white border border-stone-200 text-stone-500 font-mono">
+                          <span className="px-2.5 py-0.5 rounded-full bg-white border border-stone-200 text-stone-500 font-mono">
                             input
                           </span>
                           {message.images && message.images.length > 0 && (
@@ -280,14 +280,14 @@ export function MessageList({ messages, isGenerating, onContinue }: MessageListP
                         {message.content}
                       </div>
                     ) : (
-                      <div className="premium-card neural-border p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d97757]/25 hover:shadow-[0_18px_48px_rgba(69,52,32,0.10)] animate-in-soft">
-                        <div className="flex items-center justify-between gap-3 pb-4 mb-5 border-b border-stone-200">
+                      <div className="premium-card neural-border p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#b96b4e]/20 hover:shadow-[0_12px_30px_rgba(69,52,32,0.075)] animate-in-soft">
+                        <div className="flex items-center justify-between gap-3 pb-3.5 mb-4 border-b border-stone-200/90">
                           <div className="flex items-center gap-2 min-w-0">
-                            <div className="w-8 h-8 rounded-xl bg-[#f1e5d5] border border-stone-200 flex items-center justify-center">
-                              <Sparkles className="w-4 h-4 text-[#9a3412]" />
+                            <div className="w-7 h-7 rounded-lg bg-[#efe4d4] border border-stone-200 flex items-center justify-center">
+                              <Sparkles className="w-3.5 h-3.5 text-[#8f3d20]" />
                             </div>
                             <div>
-                              <div className="text-xs uppercase tracking-[0.18em] text-stone-500 font-bold">AI Response</div>
+                              <div className="text-[11px] uppercase tracking-[0.17em] text-stone-500 font-bold">AI Response</div>
                               <div className="text-[11px] text-stone-500">
                                 {message.variants?.length || 1} sample{(message.variants?.length || 1) > 1 ? 's' : ''} captured
                               </div>
@@ -300,13 +300,13 @@ export function MessageList({ messages, isGenerating, onContinue }: MessageListP
                                 setInspectedMessage(message.id);
                                 setSelectedPhase('final');
                               }}
-                              className={`ripple-button flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition text-xs ${
+                              className={`ripple-button flex items-center gap-1.5 px-2.5 py-1 rounded-full border transition text-[11px] ${
                                 inspectedMessageId === message.id
-                                  ? 'border-[#d97757]/40 bg-[#d97757]/10 text-[#9a3412]'
+                                  ? 'border-[#b96b4e]/35 bg-[#b96b4e]/8 text-[#8f3d20]'
                                   : 'border-stone-200 bg-white text-stone-600 hover:bg-stone-50'
                               }`}
                             >
-                              <Activity className="w-3.5 h-3.5" />
+                              <Activity className="w-3 h-3" />
                               Logprobs
                             </button>
                             <button
@@ -314,9 +314,9 @@ export function MessageList({ messages, isGenerating, onContinue }: MessageListP
                                 setInspectedMessage(message.id, activeVariant?.parsed?.hasFinalText ? 'final' : 'reasoning');
                                 openAnswerSpace();
                               }}
-                              className="ripple-button flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-stone-200 bg-white hover:bg-stone-50 text-stone-600 transition text-xs"
+                              className="ripple-button flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-stone-200 bg-white hover:bg-stone-50 text-stone-600 transition text-[11px]"
                             >
-                              <Microscope className="w-3.5 h-3.5" />
+                              <Microscope className="w-3 h-3" />
                               Explore
                             </button>
                             <button
@@ -324,9 +324,9 @@ export function MessageList({ messages, isGenerating, onContinue }: MessageListP
                                 setInspectedMessage(message.id, activeVariant?.parsed?.hasFinalText ? 'final' : 'reasoning');
                                 openAnswerSpace();
                               }}
-                              className="ripple-button flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-stone-200 bg-white hover:bg-stone-50 text-stone-600 transition text-xs"
+                              className="ripple-button flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-stone-200 bg-white hover:bg-stone-50 text-stone-600 transition text-[11px]"
                             >
-                              <GitCompareArrows className="w-3.5 h-3.5" />
+                              <GitCompareArrows className="w-3 h-3" />
                               Compare
                             </button>
                             <button
@@ -334,10 +334,10 @@ export function MessageList({ messages, isGenerating, onContinue }: MessageListP
                                 setInspectedMessage(message.id, activeVariant?.parsed?.hasFinalText ? 'final' : 'reasoning');
                                 openAnswerSpace();
                               }}
-                              className="ripple-button flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#d97757]/25 bg-[#d97757]/10 hover:bg-[#d97757]/15 text-[#9a3412] transition text-xs"
+                              className="ripple-button flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#b96b4e]/22 bg-[#b96b4e]/8 hover:bg-[#b96b4e]/12 text-[#8f3d20] transition text-[11px]"
                               title="Open llama.cpp full vocabulary explorer"
                             >
-                              <Infinity className="w-3.5 h-3.5" />
+                              <Infinity className="w-3 h-3" />
                               Universe
                             </button>
                             <button
@@ -348,7 +348,7 @@ export function MessageList({ messages, isGenerating, onContinue }: MessageListP
                               title="Open reader"
                               className="ripple-button p-1.5 rounded-full border border-stone-200 bg-white hover:bg-stone-50 text-stone-600 transition"
                             >
-                              <Maximize2 className="w-3.5 h-3.5" />
+                              <Maximize2 className="w-3 h-3" />
                             </button>
                           </div>
                         </div>
@@ -365,11 +365,11 @@ export function MessageList({ messages, isGenerating, onContinue }: MessageListP
                         {activeVariant && <DebugDrawer variant={activeVariant} message={message} />}
 
                         {activeVariant && (
-                          <div className="mt-5 pt-4 border-t border-stone-200 flex flex-wrap items-center gap-2 text-[11px] text-stone-500">
-                            <span className="px-2.5 py-1 rounded-full bg-[#f1e5d5] border border-stone-200 text-stone-700 font-mono">{totalTokens} tokens</span>
-                            <span className="px-2.5 py-1 rounded-full bg-white border border-stone-200 font-mono">{message.variants?.length || 1} run{(message.variants?.length || 1) > 1 ? 's' : ''}</span>
-                            <span className="px-2.5 py-1 rounded-full bg-white border border-stone-200 text-stone-700 font-mono">Confidence: {confidence}</span>
-                            <span className="px-2.5 py-1 rounded-full bg-white border border-stone-200 text-stone-700 font-mono">Entropy: {avgEntropy.toFixed(2)}</span>
+                          <div className="mt-4 pt-3 border-t border-stone-200/90 flex flex-wrap items-center gap-1.5 text-[11px] text-stone-500">
+                            <span className="px-2.5 py-0.5 rounded-full bg-[#efe4d4] border border-stone-200 text-stone-700 font-mono">{totalTokens} tokens</span>
+                            <span className="px-2.5 py-0.5 rounded-full bg-white border border-stone-200 font-mono">{message.variants?.length || 1} run{(message.variants?.length || 1) > 1 ? 's' : ''}</span>
+                            <span className="px-2.5 py-0.5 rounded-full bg-white border border-stone-200 text-stone-700 font-mono">Confidence: {confidence}</span>
+                            <span className="px-2.5 py-0.5 rounded-full bg-white border border-stone-200 text-stone-700 font-mono">Entropy: {avgEntropy.toFixed(2)}</span>
                           </div>
                         )}
                       </div>
@@ -400,8 +400,8 @@ export function MessageList({ messages, isGenerating, onContinue }: MessageListP
           {isGenerating && (
             <div className="flex gap-4 max-w-4xl mx-auto w-full mb-16">
                <div className="shrink-0 flex items-start mt-2">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm bg-indigo-500/20 border-indigo-500/30 text-indigo-400">
-                    <Bot className="w-5 h-5" />
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center border shadow-sm bg-[#efe4d4] border-stone-200 text-[#8f3d20]">
+                    <Bot className="w-4 h-4" />
                   </div>
                 </div>
                 <div className="flex items-center">

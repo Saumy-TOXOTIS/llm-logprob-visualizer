@@ -1,4 +1,4 @@
-import { ChatSettings, Conversation, FullVocabAlternative, FullVocabSnapshot, Message, MessageVariant } from '@/types';
+import { ChatSettings, Conversation, FullVocabAlternative, FullVocabSnapshot, ImageAttachment, Message, MessageVariant } from '@/types';
 import { classifySafety } from '@/lib/analytics/safety';
 import { generateId } from '@/lib/utils';
 import { buildTokenStats, parseLmStudioResponse } from '@/lib/lmstudio/parser';
@@ -8,11 +8,55 @@ type LlamaMessage = {
   content: string;
 };
 
+type LlamaOpenAIMessage = {
+  role: 'system' | 'user' | 'assistant';
+  content: string | Array<{
+    type: 'text' | 'image_url';
+    text?: string;
+    image_url?: { url: string };
+  }>;
+};
+
 function computeEntropy(probs: number[]): number {
   return probs.reduce((acc, p) => {
     if (p <= 0) return acc;
     return acc - p * Math.log2(p);
   }, 0);
+}
+
+function messageHasImages(message: Message) {
+  return !!message.images && message.images.length > 0;
+}
+
+function conversationHasImages(conversation: Conversation, settings: ChatSettings) {
+  const lastUserIndex = [...conversation.messages].reverse().findIndex(message => message.role === 'user');
+  const latestUserAbsoluteIndex = lastUserIndex === -1 ? -1 : conversation.messages.length - 1 - lastUserIndex;
+
+  return conversation.messages.some((message, index) => {
+    if (message.role !== 'user' || !messageHasImages(message)) return false;
+    return settings.includeImagesInHistory || index === latestUserAbsoluteIndex;
+  });
+}
+
+function buildImagePlaceholder(message: Message) {
+  if (!message.images?.length) return message.content;
+  const imageNames = message.images.map(image => image.name).join(', ');
+  const prefix = message.content ? `${message.content}\n` : '';
+  return `${prefix}[Images attached: ${imageNames}]`;
+}
+
+function buildLlamaMultimodalContent(text: string, images: ImageAttachment[]) {
+  const parts: LlamaOpenAIMessage['content'] = [];
+  if (text) {
+    parts.push({ type: 'text', text });
+  }
+  images.forEach(image => {
+    parts.push({
+      type: 'image_url',
+      image_url: { url: `data:${image.mimeType};base64,${image.base64}` }
+    });
+  });
+  return parts.length > 0 ? parts : text;
 }
 
 async function callLlamaCpp(baseUrl: string, endpointPath: string, payload?: any, method?: 'GET' | 'POST') {
@@ -67,7 +111,7 @@ export function buildTemplateMessages(
     if (msg.status === 'error' || msg.status === 'generating' || msg.role === 'system') return;
 
     if (msg.role === 'user') {
-      messages.push({ role: 'user', content: msg.content });
+      messages.push({ role: 'user', content: messageHasImages(msg) ? buildImagePlaceholder(msg) : msg.content });
       return;
     }
 
@@ -100,7 +144,7 @@ export function buildLlamaChatMessages(conversation: Conversation, settings: Cha
     if (msg.status === 'error' || msg.status === 'generating' || msg.role === 'system') return;
 
     if (msg.role === 'user') {
-      messages.push({ role: 'user', content: msg.content });
+      messages.push({ role: 'user', content: messageHasImages(msg) ? buildImagePlaceholder(msg) : msg.content });
       return;
     }
 
@@ -117,11 +161,103 @@ export function buildLlamaChatMessages(conversation: Conversation, settings: Cha
   return messages;
 }
 
+export function buildLlamaOpenAIChatMessages(conversation: Conversation, settings: ChatSettings): LlamaOpenAIMessage[] {
+  const messages: LlamaOpenAIMessage[] = [];
+  if (settings.systemPrompt) {
+    messages.push({ role: 'system', content: settings.systemPrompt });
+  }
+
+  const lastUserIndex = [...conversation.messages].reverse().findIndex(message => message.role === 'user');
+  const latestUserAbsoluteIndex = lastUserIndex === -1 ? -1 : conversation.messages.length - 1 - lastUserIndex;
+
+  conversation.messages.forEach((msg, index) => {
+    if (msg.status === 'error' || msg.status === 'generating' || msg.role === 'system') return;
+
+    if (msg.role === 'user') {
+      const hasImages = messageHasImages(msg);
+      const shouldSendImages = hasImages && (settings.includeImagesInHistory || index === latestUserAbsoluteIndex);
+
+      if (shouldSendImages) {
+        messages.push({
+          role: 'user',
+          content: buildLlamaMultimodalContent(msg.content, msg.images || [])
+        });
+      } else if (hasImages) {
+        messages.push({ role: 'user', content: buildImagePlaceholder(msg) });
+      } else {
+        messages.push({ role: 'user', content: msg.content });
+      }
+      return;
+    }
+
+    const activeVariant = msg.variants?.find(v => v.id === msg.activeVariantId) || msg.variants?.[0];
+    const content = settings.includeReasoningInContext
+      ? activeVariant?.content || msg.content
+      : activeVariant?.finalText || activeVariant?.content || msg.content;
+
+    if (content) {
+      messages.push({ role: 'assistant', content });
+    }
+  });
+
+  return messages;
+}
+
+async function sendMultimodalMessageToLlamaCpp(
+  conversation: Conversation,
+  newMessage: string,
+  settings: ChatSettings
+) {
+  const baseUrl = settings.llamaCppBaseUrl || 'http://127.0.0.1:8080';
+  const model = settings.llamaCppModelAlias || settings.model;
+  const messages = buildLlamaOpenAIChatMessages(conversation, settings);
+
+  const payload: any = {
+    model,
+    messages,
+    temperature: settings.temperature,
+    top_p: settings.top_p,
+    stream: false,
+    max_tokens: settings.max_output_tokens || 2048
+  };
+
+  if (settings.top_k !== undefined) payload.top_k = settings.top_k;
+  if (settings.min_p !== undefined) payload.min_p = settings.min_p;
+  if (settings.presence_penalty !== undefined) payload.presence_penalty = settings.presence_penalty;
+  if (settings.frequency_penalty !== undefined) payload.frequency_penalty = settings.frequency_penalty;
+  if (settings.repeat_penalty !== undefined) payload.repeat_penalty = settings.repeat_penalty;
+  if (settings.seed !== undefined) payload.seed = settings.seed;
+  if (settings.stop && settings.stop.length > 0) payload.stop = settings.stop;
+  if (settings.top_logprobs && settings.top_logprobs > 0) {
+    payload.logprobs = true;
+    payload.top_logprobs = settings.top_logprobs;
+  }
+
+  const rawJson = await callLlamaCpp(baseUrl, '/v1/chat/completions', payload);
+  const parsed = parseLmStudioResponse(rawJson, settings);
+  const finalStats = buildTokenStats(parsed.finalTokens);
+  const reasoningStats = buildTokenStats(parsed.reasoningTokens);
+
+  return {
+    rawResponse: rawJson,
+    parsedOutput: parsed,
+    stats: finalStats,
+    reasoningStats,
+    settingsUsed: settings,
+    sentContent: newMessage,
+    requestPayload: payload
+  };
+}
+
 export async function sendMessageToLlamaCpp(
   conversation: Conversation,
   newMessage: string,
   settings: ChatSettings
 ) {
+  if (conversationHasImages(conversation, settings)) {
+    return sendMultimodalMessageToLlamaCpp(conversation, newMessage, settings);
+  }
+
   const baseUrl = settings.llamaCppBaseUrl || 'http://127.0.0.1:8080';
   const messages = buildLlamaChatMessages(conversation, settings);
   const prompt = await applyLlamaTemplate(settings, messages);

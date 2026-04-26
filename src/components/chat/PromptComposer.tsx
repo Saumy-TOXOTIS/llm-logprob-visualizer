@@ -100,7 +100,7 @@ export function PromptComposer({ onSend, isGenerating }: PromptComposerProps) {
   ];
 
   return (
-    <div className="p-4 border-t border-stone-200 bg-[#fbf7ef]/90 backdrop-blur-2xl">
+    <div className="p-3.5 border-t border-stone-200/80 bg-[#fbf8f2]/90 backdrop-blur-2xl">
       <div
         className={`max-w-4xl mx-auto flex flex-col gap-2 relative rounded-xl transition-all ${
           isDragOver ? 'ring-2 ring-indigo-500/60 bg-indigo-500/5' : ''
@@ -166,19 +166,19 @@ export function PromptComposer({ onSend, isGenerating }: PromptComposerProps) {
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
             placeholder={images.length > 0 ? "Add a prompt with your images... (Shift+Enter for newline)" : "Type a message... (Shift+Enter for newline)"}
-            className="w-full bg-white border border-stone-200 rounded-2xl p-4 pr-24 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#d97757]/40 focus:border-[#d97757]/45 min-h-[80px] shadow-[0_12px_32px_rgba(69,52,32,0.08)] transition text-stone-900 placeholder:text-stone-400"
+            className="w-full bg-white/86 border border-stone-200/90 rounded-xl p-3.5 pr-20 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#b96b4e]/30 focus:border-[#b96b4e]/40 min-h-[74px] shadow-[0_8px_22px_rgba(69,52,32,0.055)] transition text-stone-900 placeholder:text-stone-400"
             rows={3}
             disabled={isGenerating}
           />
-          <div className="absolute right-3 bottom-3 flex items-center gap-1.5">
+          <div className="absolute right-2.5 bottom-2.5 flex items-center gap-1.5">
             {/* Image upload button */}
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isGenerating}
               title="Attach images"
-              className="ripple-button p-2 text-stone-500 hover:text-[#9a3412] hover:bg-[#d97757]/10 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition"
+              className="ripple-button p-1.5 text-stone-500 hover:text-[#8f3d20] hover:bg-[#b96b4e]/8 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition"
             >
-              <ImagePlus className="w-4 h-4" />
+              <ImagePlus className="w-3.5 h-3.5" />
             </button>
             <input
               ref={fileInputRef}
@@ -202,19 +202,19 @@ export function PromptComposer({ onSend, isGenerating }: PromptComposerProps) {
                 }
               }}
               disabled={(!prompt.trim() && images.length === 0) || isGenerating}
-              className="ripple-button p-2 bg-[#d97757] text-white hover:bg-[#c96442] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition border border-[#b85c38]/20 shadow-sm"
+              className="ripple-button p-1.5 bg-[#c87556] text-white hover:bg-[#b96b4e] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition border border-[#9f573d]/18 shadow-sm"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
       </div>
-      <div className="max-w-4xl mx-auto mt-2 flex flex-wrap gap-2 text-xs">
+      <div className="max-w-4xl mx-auto mt-2 flex flex-wrap gap-1.5 text-[11px]">
         {templates.map(t => (
           <button
             key={t}
             onClick={() => setPrompt(t)}
-            className="ripple-button px-2.5 py-1 rounded-full bg-white/70 border border-stone-200 hover:bg-white text-stone-500 transition"
+            className="ripple-button px-2.5 py-1 rounded-full bg-white/62 border border-stone-200/90 hover:bg-white text-stone-500 transition"
           >
             {t}
           </button>

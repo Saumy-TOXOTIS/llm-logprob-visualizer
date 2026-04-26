@@ -35,16 +35,16 @@ function CollapsibleSection({ title, defaultOpen = false, children }: { title: s
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border border-stone-200 rounded-2xl bg-white overflow-hidden mb-2">
+    <div className="border border-stone-200 rounded-xl bg-white overflow-hidden mb-2">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-3 flex justify-between items-center hover:bg-stone-50 transition text-xs font-bold uppercase text-stone-600"
+        className="w-full p-2.5 flex justify-between items-center hover:bg-stone-50 transition text-[11px] font-bold uppercase text-stone-600"
       >
         {title}
         <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       {isOpen && (
-        <div className="p-3 border-t border-stone-200 bg-[#fffaf2]">
+        <div className="p-2.5 border-t border-stone-200 bg-[#fffaf2]/80">
           {children}
         </div>
       )}
@@ -62,7 +62,7 @@ export function TokenInspector({ token, tokenIndex, activeTokens }: { token: Par
 
   if (!token) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center text-stone-500 bg-white rounded-2xl border border-stone-200 h-64">
+      <div className="flex flex-col items-center justify-center p-8 text-center text-stone-500 bg-white rounded-xl border border-stone-200 h-64">
         <span className="text-xl text-stone-400 mb-2 font-mono">_</span>
         <p>Hover or click a token to inspect its branches.</p>
       </div>
@@ -171,14 +171,14 @@ export function TokenInspector({ token, tokenIndex, activeTokens }: { token: Par
             </div>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-light text-[#d97757]">{formatPercent(token.probability)}</div>
+            <div className="text-2xl font-light text-[#8f3d20]">{formatPercent(token.probability)}</div>
             <div className="text-xs text-stone-500 font-mono">logprob: {token.logprob.toFixed(4)}</div>
           </div>
         </div>
       </CollapsibleSection>
 
       {interpretationText && (
-        <div className="rounded-2xl border border-[#d97757]/20 bg-[#d97757]/10 p-3 text-xs text-stone-700">
+        <div className="rounded-xl border border-[#b96b4e]/18 bg-[#b96b4e]/8 p-3 text-xs text-stone-700">
           {interpretationText}
         </div>
       )}
@@ -191,7 +191,7 @@ export function TokenInspector({ token, tokenIndex, activeTokens }: { token: Par
           </div>
           <div className="bg-stone-100 p-2 rounded-xl border border-stone-200">
             <div className="text-stone-500 text-[10px] uppercase mb-1">Entropy</div>
-            <div className="font-mono text-[#9a3412]">{token.entropy.toFixed(3)}</div>
+            <div className="font-mono text-[#8f3d20]">{token.entropy.toFixed(3)}</div>
           </div>
           <div className="bg-stone-100 p-2 rounded-xl border border-stone-200">
             <div className="text-stone-500 text-[10px] uppercase mb-1">Visible Mass</div>
@@ -206,17 +206,17 @@ export function TokenInspector({ token, tokenIndex, activeTokens }: { token: Par
       </CollapsibleSection>
 
       <CollapsibleSection title={`Discarded Branch Explorer (${token.top_logprobs.length > 0 ? token.top_logprobs.length - 1 : 0})`} defaultOpen={true}>
-        <p className="text-xs text-stone-600 mb-3 bg-[#d97757]/10 p-2 border border-[#d97757]/20 rounded-xl">
+        <p className="text-xs text-stone-600 mb-3 bg-[#b96b4e]/8 p-2 border border-[#b96b4e]/18 rounded-xl">
           These are real next-token candidates exposed by top_logprobs. They are not complete answers unless continued.
         </p>
 
         <div className="flex flex-wrap gap-1 mb-3">
-           <button onClick={() => setFilter('all')} className={`text-[10px] px-2 py-1 rounded border ${filter === 'all' ? 'bg-[#d97757]/10 border-[#d97757]/30 text-[#9a3412]' : 'border-stone-200 text-stone-500 hover:bg-stone-50'}`}>All</button>
-           <button onClick={() => setFilter('high_prob')} className={`text-[10px] px-2 py-1 rounded border ${filter === 'high_prob' ? 'bg-[#d97757]/10 border-[#d97757]/30 text-[#9a3412]' : 'border-stone-200 text-stone-500 hover:bg-stone-50'}`}>High Prob</button>
-           <button onClick={() => setFilter('low_prob')} className={`text-[10px] px-2 py-1 rounded border ${filter === 'low_prob' ? 'bg-[#d97757]/10 border-[#d97757]/30 text-[#9a3412]' : 'border-stone-200 text-stone-500 hover:bg-stone-50'}`}>Low Prob</button>
+           <button onClick={() => setFilter('all')} className={`text-[10px] px-2 py-1 rounded border ${filter === 'all' ? 'bg-[#b96b4e]/8 border-[#b96b4e]/25 text-[#8f3d20]' : 'border-stone-200 text-stone-500 hover:bg-stone-50'}`}>All</button>
+           <button onClick={() => setFilter('high_prob')} className={`text-[10px] px-2 py-1 rounded border ${filter === 'high_prob' ? 'bg-[#b96b4e]/8 border-[#b96b4e]/25 text-[#8f3d20]' : 'border-stone-200 text-stone-500 hover:bg-stone-50'}`}>High Prob</button>
+           <button onClick={() => setFilter('low_prob')} className={`text-[10px] px-2 py-1 rounded border ${filter === 'low_prob' ? 'bg-[#b96b4e]/8 border-[#b96b4e]/25 text-[#8f3d20]' : 'border-stone-200 text-stone-500 hover:bg-stone-50'}`}>Low Prob</button>
            <button onClick={() => setFilter('unsafe')} className={`text-[10px] px-2 py-1 rounded border flex items-center gap-1 ${filter === 'unsafe' ? 'bg-red-50 border-red-200 text-red-700' : 'border-stone-200 text-stone-500 hover:bg-stone-50'}`}><ShieldAlert className="w-3 h-3"/> Unsafe</button>
            {(token.rank > 0 || filter === 'top_discarded') && (
-             <button onClick={() => setFilter('top_discarded')} className={`text-[10px] px-2 py-1 rounded border ${filter === 'top_discarded' ? 'bg-[#d97757]/10 border-[#d97757]/30 text-[#9a3412]' : 'border-stone-200 text-stone-500 hover:bg-stone-50'}`}>Stronger than Chosen</button>
+             <button onClick={() => setFilter('top_discarded')} className={`text-[10px] px-2 py-1 rounded border ${filter === 'top_discarded' ? 'bg-[#b96b4e]/8 border-[#b96b4e]/25 text-[#8f3d20]' : 'border-stone-200 text-stone-500 hover:bg-stone-50'}`}>Stronger than Chosen</button>
            )}
         </div>
 
@@ -236,11 +236,11 @@ export function TokenInspector({ token, tokenIndex, activeTokens }: { token: Par
                   ? 'bg-stone-100 text-stone-600 border-stone-200'
                   : 'bg-violet-50 text-violet-700 border-violet-200';
               return (
-              <div key={`${i}-${alt.token}`} className="group flex flex-col gap-3 p-4 rounded-2xl border border-stone-200 bg-white shadow-sm hover:border-[#d97757]/30 hover:-translate-y-0.5 transition-all duration-200">
+              <div key={`${i}-${alt.token}`} className="group flex flex-col gap-3 p-3 rounded-xl border border-stone-200 bg-white shadow-sm hover:border-[#b96b4e]/25 hover:-translate-y-0.5 transition-all duration-200">
                 <div className="flex justify-between items-start">
                   <div className="flex items-start gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-xl bg-[#f1e5d5] border border-stone-200 flex items-center justify-center shrink-0">
-                      <GitBranch className="w-4 h-4 text-[#9a3412]" />
+                    <div className="w-7 h-7 rounded-lg bg-[#efe4d4] border border-stone-200 flex items-center justify-center shrink-0">
+                      <GitBranch className="w-3.5 h-3.5 text-[#8f3d20]" />
                     </div>
                     <div className="min-w-0">
                       <div className="font-mono text-stone-900 text-sm truncate">"{alt.token}"</div>
@@ -250,26 +250,26 @@ export function TokenInspector({ token, tokenIndex, activeTokens }: { token: Par
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                     <span className="text-xs text-[#9a3412] font-mono">{formatPercent(alt.probability)}</span>
+                     <span className="text-xs text-[#8f3d20] font-mono">{formatPercent(alt.probability)}</span>
                      <button 
                        onClick={() => setExperimentAlt(alt)}
                        title="Experiment / Continue branch"
-                       className="ripple-button px-2 py-1.5 flex items-center gap-1.5 opacity-90 hover:opacity-100 text-[#9a3412] hover:bg-[#d97757]/15 border border-[#d97757]/20 transition cursor-pointer bg-[#d97757]/10 rounded-full text-[10px] font-bold uppercase"
+                       className="ripple-button px-2 py-1.5 flex items-center gap-1.5 opacity-90 hover:opacity-100 text-[#8f3d20] hover:bg-[#b96b4e]/12 border border-[#b96b4e]/20 transition cursor-pointer bg-[#b96b4e]/8 rounded-full text-[10px] font-bold uppercase"
                      >
-                       <FlaskConical className="w-4 h-4" />
+                       <FlaskConical className="w-3.5 h-3.5" />
                        Continue
                      </button>
                   </div>
                 </div>
 
-                <div className="text-[10px] text-stone-500 font-mono line-clamp-1 mb-1 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-[#d97757]/50 before:rounded pl-2">
-                   .. <span className="line-through opacity-70">"{token.token}"</span> <span className="text-[#9a3412]">"{alt.token}"</span> ..
+                <div className="text-[10px] text-stone-500 font-mono line-clamp-1 mb-1 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-[#b96b4e]/38 before:rounded pl-2">
+                   .. <span className="line-through opacity-70">"{token.token}"</span> <span className="text-[#8f3d20]">"{alt.token}"</span> ..
                 </div>
 
                 <div className="space-y-1">
                   <div className="h-2 rounded-full bg-stone-200 border border-stone-200 overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-[#d97757] to-[#8f5f46] transition-all"
+                      className="h-full rounded-full bg-gradient-to-r from-[#c87556] to-[#7c6559] transition-all"
                       style={{ width: `${Math.max(3, Math.min(100, alt.probability * 100))}%` }}
                     />
                   </div>
@@ -297,15 +297,15 @@ export function TokenInspector({ token, tokenIndex, activeTokens }: { token: Par
         </div>
         
         {experimentResult && (
-          <div className="mt-4 p-4 border border-[#d97757]/25 bg-white rounded-2xl shadow-sm">
+          <div className="mt-4 p-3 border border-[#b96b4e]/22 bg-white rounded-xl shadow-sm">
              <div className="flex items-center justify-between mb-2">
-                 <h4 className="text-[10px] uppercase font-bold text-[#9a3412]">Experimental Branch Result ({experimentResult.mode})</h4>
+                 <h4 className="text-[10px] uppercase font-bold text-[#8f3d20]">Experimental Branch Result ({experimentResult.mode})</h4>
                  <button onClick={() => setExperimentResult(null)} className="text-stone-400 hover:text-stone-700">
                     <X className="w-3 h-3" />
                  </button>
              </div>
              {experimentResult.status === 'loading' ? (
-                 <div className="text-xs text-[#9a3412] animate-pulse flex items-center justify-center p-4">
+                 <div className="text-xs text-[#8f3d20] animate-pulse flex items-center justify-center p-4">
                    <FlaskConical className="w-4 h-4 animate-bounce mr-2" />
                    Running branch analysis...
                 </div>

@@ -32,7 +32,7 @@ export function ExperimentModal({ isOpen, onClose, token, alternative, onContinu
         <div className="p-6 flex flex-col gap-4">
           <div className="bg-white p-3 rounded-xl border border-stone-200 font-mono text-sm leading-relaxed text-stone-700">
             ... <span className="line-through text-stone-400 opacity-70">"{token.token}"</span> 
-            <span className="bg-[#d97757]/15 text-[#9a3412] px-1 ml-1 rounded">"{alternative.token}"</span> ...
+            <span className="bg-[#b96b4e]/10 text-[#8f3d20] px-1 ml-1 rounded">"{alternative.token}"</span> ...
           </div>
 
           <div className="flex gap-2 flex-wrap">
@@ -47,14 +47,14 @@ export function ExperimentModal({ isOpen, onClose, token, alternative, onContinu
             ))}
           </div>
           
-          <p className="text-xs text-stone-500 border-l-2 border-[#d97757]/50 pl-3">
+          <p className="text-xs text-stone-500 border-l-2 border-[#b96b4e]/35 pl-3">
              Local research mode: labels are observability metadata only. Raw continuation sends the branch prefix directly to your local model.
           </p>
 
           <div className="grid grid-cols-1 gap-2 mt-2">
              <button 
                 onClick={() => { onContinue('raw_continuation', alternative); onClose(); }}
-                className="p-3 rounded-xl border border-[#d97757]/30 bg-[#d97757]/10 hover:bg-[#d97757]/15 text-left flex items-center gap-3 transition-colors text-stone-900"
+                className="p-3 rounded-xl border border-[#b96b4e]/25 bg-[#b96b4e]/8 hover:bg-[#b96b4e]/12 text-left flex items-center gap-3 transition-colors text-stone-900"
              >
                 <RadioTower className="w-5 h-5 text-[#b85c38]" />
                 <div>

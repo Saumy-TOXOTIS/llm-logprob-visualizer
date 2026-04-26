@@ -120,15 +120,15 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
   if (!mounted) return null;
 
   const modal = (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-2xl z-[200] flex items-center justify-center p-6 animate-in-soft">
+    <div className="fixed inset-0 bg-stone-950/34 backdrop-blur-2xl z-[200] flex items-center justify-center p-5 animate-in-soft">
       <div
-        className="bg-[#0b1118]/95 border border-white/10 w-full max-w-5xl rounded-[28px] shadow-[0_30px_120px_rgba(0,0,0,0.65)] flex flex-col max-h-[88vh] neural-border overflow-hidden text-zinc-100"
+        className="settings-modal-shell bg-[#fbf8f2]/96 border border-stone-200/90 w-full max-w-5xl rounded-2xl shadow-[0_24px_80px_rgba(69,52,32,0.18)] flex flex-col max-h-[88vh] neural-border overflow-hidden text-stone-900"
         style={{ transform: `translate(${modalOffset.x}px, ${modalOffset.y}px)` }}
       >
         
         {/* Header */}
         <div
-          className="flex items-center justify-between p-6 border-b border-white/10 bg-gradient-to-r from-sky-400/8 via-violet-400/8 to-transparent cursor-grab active:cursor-grabbing"
+          className="flex items-center justify-between p-5 border-b border-stone-200/90 bg-white/34 cursor-grab active:cursor-grabbing"
           onMouseDown={(event) => {
             setDragOrigin({
               pointerX: event.clientX,
@@ -140,25 +140,25 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
           title="Drag to move"
         >
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-400/20 to-violet-500/20 border border-sky-300/20 flex items-center justify-center shadow-[0_0_32px_rgba(56,189,248,0.14)]">
-              <Sliders className="w-5 h-5 text-sky-200" />
+            <div className="w-9 h-9 rounded-xl bg-[#efe4d4] border border-stone-200 flex items-center justify-center shadow-sm">
+              <Sliders className="w-4 h-4 text-[#8f3d20]" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold flex items-center gap-2">Lab Settings</h2>
-              <p className="text-xs text-zinc-500 mt-0.5">Tune sampling, context, limits, and multimodal behavior.</p>
+              <h2 className="text-lg font-semibold flex items-center gap-2">Lab Settings</h2>
+              <p className="text-xs text-stone-500 mt-0.5">Tune sampling, context, limits, and multimodal behavior.</p>
             </div>
           </div>
           <button
             onMouseDown={(event) => event.stopPropagation()}
             onClick={onClose}
-            className="p-2 hover:bg-white/8 rounded-2xl transition border border-transparent hover:border-white/10"
+            className="p-2 hover:bg-stone-100 rounded-xl transition border border-transparent hover:border-stone-200"
           >
-            <X className="w-5 h-5 text-zinc-400" />
+            <X className="w-4 h-4 text-stone-500" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-8 min-h-0 bg-black/10 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-5 space-y-6 min-h-0 bg-[#f7f1e8]/54 custom-scrollbar">
           
           <div className={`flex justify-between items-center p-4 rounded-2xl border ${modeTone}`}>
              <div>
@@ -213,7 +213,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                   onClick={() => setLocal({...local, inferenceProvider: 'llamacpp'})}
                   className={`rounded-xl border px-4 py-3 text-left transition ${
                     local.inferenceProvider === 'llamacpp'
-                      ? 'border-[#d97757]/50 bg-[#d97757]/15 text-orange-100'
+                      ? 'border-[#b96b4e]/35 bg-[#b96b4e]/10 text-[#8f3d20]'
                       : 'border-white/10 bg-black/20 text-zinc-400 hover:text-zinc-100'
                   }`}
                 >
@@ -250,9 +250,10 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                         setLocal({...local, model: e.target.value});
                       }
                     }}
-                    value={['qwen/qwen3.6-35b-a3b', 'google/gemma-4-26b-a4b'].includes(local.model) ? local.model : 'custom'}
-                    className="bg-zinc-800 text-zinc-300 border-l border-border px-2 py-2 text-sm rounded-r-lg outline-none max-w-[100px]"
+                    value={['qwen/qwen3.5-9b', 'qwen/qwen3.6-35b-a3b', 'google/gemma-4-26b-a4b'].includes(local.model) ? local.model : 'custom'}
+                    className="bg-zinc-800 text-zinc-300 border-l border-border px-2 py-2 text-sm rounded-r-lg outline-none min-w-[124px] max-w-[140px]"
                   >
+                    <option value="qwen/qwen3.5-9b">Qwen 9B</option>
                     <option value="qwen/qwen3.6-35b-a3b">Qwen 35B</option>
                     <option value="google/gemma-4-26b-a4b">Gemma 26B</option>
                     <option value="custom">Custom...</option>
@@ -288,7 +289,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#d97757]/25 bg-[#d97757]/10 p-4 space-y-4">
+            <div className="rounded-xl border border-[#b96b4e]/22 bg-[#b96b4e]/7 p-4 space-y-4">
               <div>
                 <div className="text-sm font-semibold text-[#fed7aa]">llama.cpp Full Universe Backend</div>
                 <div className="text-[11px] text-orange-100/70 mt-1">
@@ -302,7 +303,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                     type="text"
                     value={local.llamaCppBaseUrl || 'http://127.0.0.1:8080'}
                     onChange={(e) => setLocal({...local, llamaCppBaseUrl: e.target.value})}
-                    className="w-full bg-black/40 border border-[#d97757]/20 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:border-[#d97757] outline-none transition"
+                    className="w-full bg-black/40 border border-[#b96b4e]/18 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:border-[#b96b4e] outline-none transition"
                   />
                 </div>
                 <div>
@@ -311,7 +312,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                     type="text"
                     value={local.llamaCppModelAlias || 'qwen3.5-9b'}
                     onChange={(e) => setLocal({...local, llamaCppModelAlias: e.target.value})}
-                    className="w-full bg-black/40 border border-[#d97757]/20 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:border-[#d97757] outline-none transition"
+                    className="w-full bg-black/40 border border-[#b96b4e]/18 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:border-[#b96b4e] outline-none transition"
                   />
                 </div>
                 <div>
@@ -321,7 +322,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                     placeholder="0 = auto n_vocab"
                     value={local.fullVocabNProbs || 0}
                     onChange={(e) => setLocal({...local, fullVocabNProbs: parseInt(e.target.value) || 0})}
-                    className="w-full bg-black/40 border border-[#d97757]/20 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:border-[#d97757] outline-none transition font-mono"
+                    className="w-full bg-black/40 border border-[#b96b4e]/18 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:border-[#b96b4e] outline-none transition font-mono"
                   />
                 </div>
                 <div>
@@ -330,17 +331,17 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                     type="number"
                     value={local.fullVocabDisplayLimit || 500}
                     onChange={(e) => setLocal({...local, fullVocabDisplayLimit: parseInt(e.target.value) || 500})}
-                    className="w-full bg-black/40 border border-[#d97757]/20 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:border-[#d97757] outline-none transition font-mono"
+                    className="w-full bg-black/40 border border-[#b96b4e]/18 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:border-[#b96b4e] outline-none transition font-mono"
                   />
                 </div>
               </div>
-              <label className="flex items-center justify-between gap-3 rounded-xl border border-[#d97757]/20 bg-black/20 p-3 text-sm text-orange-100">
+              <label className="flex items-center justify-between gap-3 rounded-xl border border-[#b96b4e]/18 bg-black/20 p-3 text-sm text-orange-100">
                 <span>Use post-sampling probabilities</span>
                 <input
                   type="checkbox"
                   checked={local.fullVocabPostSampling ?? false}
                   onChange={(e) => setLocal({...local, fullVocabPostSampling: e.target.checked})}
-                  className="accent-[#d97757]"
+                  className="accent-[#b96b4e]"
                 />
               </label>
             </div>
@@ -351,7 +352,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
               <ToggleLeft className="w-4 h-4" /> UI & Context Handling
             </label>
 
-            <div className="rounded-2xl border border-[#d97757]/25 bg-[#d97757]/10 p-4 space-y-3">
+            <div className="rounded-xl border border-[#b96b4e]/22 bg-[#b96b4e]/7 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col pr-4">
                   <span className="text-sm font-semibold text-[#7c2d12]">Local Research Mode</span>
@@ -359,17 +360,17 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer shrink-0">
                   <input type="checkbox" checked={local.localResearchMode ?? true} onChange={(e) => setLocal({...local, localResearchMode: e.target.checked})} className="sr-only peer" />
-                  <div className="w-9 h-5 bg-stone-300 rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#d97757]"></div>
+                  <div className="w-9 h-5 bg-stone-300 rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#b96b4e]"></div>
                 </label>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <label className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white/60 p-3 text-sm text-stone-700">
                   <span>Risk labels only</span>
-                  <input type="checkbox" checked={local.showRiskLabelsOnly ?? true} onChange={(e) => setLocal({...local, showRiskLabelsOnly: e.target.checked})} className="accent-[#d97757]" />
+                  <input type="checkbox" checked={local.showRiskLabelsOnly ?? true} onChange={(e) => setLocal({...local, showRiskLabelsOnly: e.target.checked})} className="accent-[#b96b4e]" />
                 </label>
                 <label className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white/60 p-3 text-sm text-stone-700">
                   <span>Raw branch continuation</span>
-                  <input type="checkbox" checked={local.allowRawBranchContinuation ?? true} onChange={(e) => setLocal({...local, allowRawBranchContinuation: e.target.checked})} className="accent-[#d97757]" />
+                  <input type="checkbox" checked={local.allowRawBranchContinuation ?? true} onChange={(e) => setLocal({...local, allowRawBranchContinuation: e.target.checked})} className="accent-[#b96b4e]" />
                 </label>
               </div>
             </div>
@@ -559,12 +560,12 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-white/10 flex justify-end gap-3 bg-black/20">
-          <button onClick={onClose} className="px-5 py-2 rounded-lg text-sm font-medium hover:bg-white/5 transition">
+        <div className="p-4 border-t border-stone-200/90 flex justify-end gap-3 bg-white/38">
+          <button onClick={onClose} className="px-5 py-2 rounded-lg text-sm font-medium hover:bg-stone-100 transition">
             Cancel
           </button>
-          <button onClick={handleSave} className="ripple-button flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 rounded-2xl text-sm text-white font-medium shadow-lg shadow-sky-900/20 transition">
-            <Save className="w-4 h-4" /> Save Lab Settings
+          <button onClick={handleSave} className="ripple-button flex items-center gap-2 px-5 py-2 bg-[#c87556] hover:bg-[#b96b4e] rounded-xl text-sm text-white font-medium shadow-sm transition">
+            <Save className="w-3.5 h-3.5" /> Save Lab Settings
           </button>
         </div>
       </div>

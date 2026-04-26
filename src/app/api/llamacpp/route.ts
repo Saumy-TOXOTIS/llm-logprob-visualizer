@@ -8,9 +8,9 @@ export async function POST(req: NextRequest) {
     const rawBody = await req.text();
     const bodySize = new TextEncoder().encode(rawBody).length;
 
-    if (bodySize > 5 * 1024 * 1024) {
+    if (bodySize > 20 * 1024 * 1024) {
       return NextResponse.json(
-        { error: `Request too large: ${(bodySize / (1024 * 1024)).toFixed(1)} MB. Max 5 MB.` },
+        { error: `Request too large: ${(bodySize / (1024 * 1024)).toFixed(1)} MB. Max 20 MB. Try reducing image count or quality.` },
         { status: 413 }
       );
     }

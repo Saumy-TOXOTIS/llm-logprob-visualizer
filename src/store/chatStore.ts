@@ -14,6 +14,7 @@ interface ChatState {
   isFullscreenReader: boolean;
   isFullscreenAnalytics: boolean;
   isAnswerSpaceOpen: boolean;
+  uiTheme: 'light' | 'dark';
   
   isSidebarOpen: boolean;
   isSplitView: boolean;
@@ -33,18 +34,20 @@ interface ChatState {
   closeAnswerSpace: () => void;
   toggleSidebar: () => void;
   toggleSplitView: () => void;
+  setUiTheme: (theme: 'light' | 'dark') => void;
+  toggleUiTheme: () => void;
   updateGlobalSettings: (settings: Partial<ChatSettings>) => void;
 }
 
 export const DEFAULT_SETTINGS: ChatSettings = {
-  inferenceProvider: 'lmstudio',
+  inferenceProvider: 'llamacpp',
   baseUrl: 'http://localhost:1234',
   endpointPath: '/v1/responses',
   model: 'qwen/qwen3.5-9b',
   systemPrompt: '',
   temperature: 1,
   top_p: 0.95,
-  top_k: 48,
+  top_k: 64,
   min_p: 0.05,
   presence_penalty: 1,
   repeat_penalty: 1.5,
@@ -87,6 +90,7 @@ export const useChatStore = create<ChatState>((set) => ({
   isFullscreenReader: false,
   isFullscreenAnalytics: false,
   isAnswerSpaceOpen: false,
+  uiTheme: 'dark',
   
   isSidebarOpen: true,
   isSplitView: true,
@@ -107,6 +111,8 @@ export const useChatStore = create<ChatState>((set) => ({
   closeAnswerSpace: () => set({ isAnswerSpaceOpen: false }),
   toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
   toggleSplitView: () => set((state) => ({ isSplitView: !state.isSplitView })),
+  setUiTheme: (theme) => set({ uiTheme: theme }),
+  toggleUiTheme: () => set((state) => ({ uiTheme: state.uiTheme === 'dark' ? 'light' : 'dark' })),
   updateGlobalSettings: (newSettings) => set((state) => ({
     globalSettings: { ...state.globalSettings, ...newSettings }
   }))

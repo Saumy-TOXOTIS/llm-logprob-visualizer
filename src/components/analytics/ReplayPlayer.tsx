@@ -79,8 +79,8 @@ export function ReplayPlayer({ tokens, onExit }: ReplayPlayerProps) {
   if (!tokens || tokens.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-4 bg-white p-4 rounded-2xl border border-stone-200 mt-4 shrink-0 shadow-sm">
-      <div className="flex justify-between items-center text-xs uppercase font-bold text-[#9a3412] tracking-wider">
+    <div className="flex flex-col gap-3 bg-white/78 p-3.5 rounded-xl border border-stone-200/90 mt-3 shrink-0 shadow-sm">
+      <div className="flex justify-between items-center text-[11px] uppercase font-bold text-[#8f3d20] tracking-wider">
         <span>Replay Generation</span>
         <span className="font-mono">{currentIndex} / {tokens.length}</span>
       </div>
@@ -88,22 +88,22 @@ export function ReplayPlayer({ tokens, onExit }: ReplayPlayerProps) {
       <div className="flex items-center gap-3">
         <button
           onClick={() => jumpBy(-10)}
-          className="p-2 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 transition"
+          className="p-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 transition"
           title="Jump back 10 tokens"
         >
-          <Rewind className="w-4 h-4" />
+          <Rewind className="w-3.5 h-3.5" />
         </button>
         <button 
           onClick={handlePlayPause}
-          className="p-2 rounded-full bg-[#d97757]/10 hover:bg-[#d97757]/15 text-[#9a3412] border border-[#d97757]/20 transition"
+          className="p-1.5 rounded-full bg-[#b96b4e]/8 hover:bg-[#b96b4e]/12 text-[#8f3d20] border border-[#b96b4e]/20 transition"
         >
-          {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+          {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
         </button>
         <button 
           onClick={handleStop}
-          className="p-2 rounded-full hover:bg-red-50 text-stone-400 hover:text-red-600 transition"
+          className="p-1.5 rounded-full hover:bg-red-50 text-stone-400 hover:text-red-600 transition"
         >
-          <Square className="w-4 h-4" />
+          <Square className="w-3.5 h-3.5" />
         </button>
         {onExit && (
            <button 
@@ -123,34 +123,34 @@ export function ReplayPlayer({ tokens, onExit }: ReplayPlayerProps) {
           setLockedToken(idx);
         }}>
           <div 
-            className="h-full bg-gradient-to-r from-[#d97757] to-[#8f5f46] transition-all duration-100" 
+            className="h-full bg-gradient-to-r from-[#c87556] to-[#7c6559] transition-all duration-100" 
             style={{ width: `${progress}%` }}
           />
         </div>
 
         <button 
           onClick={changeSpeed}
-          className="px-2 py-1 flex items-center gap-1 rounded-xl bg-stone-50 border border-stone-200 hover:bg-stone-100 text-xs font-mono w-16 justify-center text-stone-700"
+          className="px-2 py-1 flex items-center gap-1 rounded-lg bg-stone-50 border border-stone-200 hover:bg-stone-100 text-[11px] font-mono w-16 justify-center text-stone-700"
         >
           <FastForward className="w-3 h-3" />
           {speed}x
         </button>
         <button
           onClick={() => jumpBy(10)}
-          className="p-2 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 transition"
+          className="p-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 transition"
           title="Jump forward 10 tokens"
         >
-          <FastForward className="w-4 h-4" />
+          <FastForward className="w-3.5 h-3.5" />
         </button>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_180px] gap-3">
-        <div className="rounded-2xl border border-stone-200 bg-[#fffaf2] p-4 min-h-40 max-h-72 overflow-auto custom-scrollbar">
+        <div className="rounded-xl border border-stone-200 bg-[#fffaf2]/80 p-3.5 min-h-36 max-h-72 overflow-auto custom-scrollbar">
           {replayText ? (
             <div className="whitespace-pre-wrap text-sm leading-relaxed text-stone-800">
               {replayText}
               {currentIndex < tokens.length && (
-                <span className="ml-0.5 rounded bg-[#d97757]/15 px-1 text-[#9a3412] font-mono animate-pulse">
+                <span className="ml-0.5 rounded bg-[#b96b4e]/12 px-1 text-[#8f3d20] font-mono animate-pulse">
                   {activeToken?.token || ''}
                 </span>
               )}
@@ -162,7 +162,7 @@ export function ReplayPlayer({ tokens, onExit }: ReplayPlayerProps) {
           )}
         </div>
 
-        <div className="rounded-2xl border border-stone-200 bg-stone-50 p-3">
+        <div className="rounded-xl border border-stone-200 bg-stone-50/80 p-3">
           <div className="text-[10px] uppercase tracking-[0.16em] text-stone-500 font-bold mb-2">Current Token</div>
           <div className="font-mono text-sm text-stone-950 break-all rounded-xl bg-white border border-stone-200 p-2 min-h-10">
             {currentIndex < tokens.length ? `"${activeToken?.token || ''}"` : 'Complete'}
@@ -186,7 +186,7 @@ export function ReplayPlayer({ tokens, onExit }: ReplayPlayerProps) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-stone-200 bg-stone-50 p-3">
+      <div className="rounded-xl border border-stone-200 bg-stone-50/80 p-3">
         <div className="text-[10px] uppercase tracking-[0.16em] text-stone-500 font-bold mb-2">Recent Token Trail</div>
         <div className="flex flex-wrap gap-1.5">
           {recentTokens.map((token, index) => {
@@ -197,7 +197,7 @@ export function ReplayPlayer({ tokens, onExit }: ReplayPlayerProps) {
                 key={`${absoluteIndex}-${token.token}`}
                 className={`rounded-xl border px-2 py-1 text-xs font-mono ${
                   isCurrent
-                    ? 'border-[#d97757]/30 bg-[#d97757]/10 text-[#9a3412]'
+                    ? 'border-[#b96b4e]/25 bg-[#b96b4e]/8 text-[#8f3d20]'
                     : 'border-stone-200 bg-white text-stone-600'
                 }`}
               >

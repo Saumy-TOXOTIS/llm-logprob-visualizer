@@ -39,17 +39,17 @@ export function Sidebar() {
   return (
     <div className="flex flex-col h-full bg-transparent relative">
       {/* Header */}
-      <div className="p-4 border-b border-stone-200 flex items-center justify-between">
+      <div className="p-3.5 border-b border-stone-200/80 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-[0.18em] text-stone-700">Conversations</h2>
+          <h2 className="text-[13px] font-bold uppercase tracking-[0.17em] text-stone-700">Conversations</h2>
           <p className="text-[11px] text-stone-500 mt-0.5">decision traces</p>
         </div>
         <button
           onClick={createChat}
           title="New conversation"
-          className="ripple-button p-3 bg-[#d97757] hover:bg-[#c96442] rounded-2xl transition border border-[#b85c38]/20 shadow-sm text-white"
+          className="ripple-button p-2.5 bg-[#c87556] hover:bg-[#b96b4e] rounded-xl transition border border-[#9f573d]/18 shadow-sm text-white"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5" />
         </button>
       </div>
 
@@ -59,15 +59,15 @@ export function Sidebar() {
           <div
             key={conv.id}
             onClick={() => setActiveConversation(conv.id)}
-            className={`group cursor-pointer p-3 rounded-2xl border transition-all duration-200 flex items-center justify-between ${
+            className={`group cursor-pointer p-2.5 rounded-xl border transition-all duration-200 flex items-center justify-between ${
               activeConversationId === conv.id 
-                ? 'bg-white/80 border-stone-200 text-stone-950 shadow-sm translate-x-1' 
-                : 'border-transparent hover:bg-white/55 hover:border-stone-200 text-stone-600 hover:text-stone-950'
+                ? 'bg-white/76 border-stone-200/90 text-stone-950 shadow-sm translate-x-0.5' 
+                : 'border-transparent hover:bg-white/50 hover:border-stone-200/80 text-stone-600 hover:text-stone-950'
             }`}
           >
-            <div className="flex items-center gap-3 truncate">
-              <MessageSquare className="w-4 h-4 shrink-0 opacity-50" />
-              <span className="truncate text-sm font-medium">{conv.title}</span>
+            <div className="flex items-center gap-2.5 truncate">
+              <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-50" />
+              <span className="truncate text-[13px] font-medium">{conv.title}</span>
             </div>
             <button 
               onClick={(e) => deleteChat(conv.id, e)}
@@ -80,14 +80,14 @@ export function Sidebar() {
       </div>
 
       {/* Settings Action */}
-      <div className="p-4 border-t border-stone-200">
+      <div className="p-3.5 border-t border-stone-200/80">
         <button 
           onClick={() => setShowSettings(true)}
           title="Lab settings"
-          className="ripple-button w-full py-2.5 px-3 flex items-center justify-center gap-2 rounded-2xl bg-white/65 hover:bg-white transition border border-stone-200 text-sm cursor-pointer text-stone-700"
+          className="ripple-button w-full py-2 px-3 flex items-center justify-center gap-2 rounded-xl bg-white/62 hover:bg-white transition border border-stone-200/90 text-sm cursor-pointer text-stone-700"
         >
-          <Settings className="w-4 h-4 text-stone-500" />
-          <span className="text-xs uppercase tracking-[0.16em] font-bold">Lab</span>
+          <Settings className="w-3.5 h-3.5 text-stone-500" />
+          <span className="text-[11px] uppercase tracking-[0.15em] font-bold">Lab</span>
         </button>
       </div>
 

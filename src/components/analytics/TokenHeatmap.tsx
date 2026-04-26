@@ -26,9 +26,9 @@ export function TokenHeatmap({ tokens }: TokenHeatmapProps) {
 
     // Default confidence mode
     switch (token.confidenceBand) {
-      case 'high': return isSelected ? 'bg-gradient-to-br from-emerald-400 to-green-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.35)]' : 'bg-gradient-to-br from-emerald-50 to-green-50 text-emerald-700 hover:from-emerald-100 hover:to-green-100 shadow-[0_0_14px_rgba(34,197,94,0.08)]';
-      case 'medium': return isSelected ? 'bg-gradient-to-br from-yellow-300 to-lime-500 text-stone-950 shadow-[0_0_20px_rgba(250,204,21,0.35)]' : 'bg-gradient-to-br from-yellow-50 to-lime-50 text-yellow-800 hover:from-yellow-100 hover:to-lime-100 shadow-[0_0_14px_rgba(250,204,21,0.08)]';
-      case 'low': return isSelected ? 'bg-gradient-to-br from-rose-400 to-red-600 text-white shadow-[0_0_20px_rgba(251,113,133,0.35)]' : 'bg-gradient-to-br from-rose-50 to-red-50 text-rose-700 hover:from-rose-100 hover:to-red-100 shadow-[0_0_14px_rgba(251,113,133,0.08)]';
+      case 'high': return isSelected ? 'bg-emerald-500 text-white shadow-[0_0_14px_rgba(34,197,94,0.22)]' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 shadow-[0_0_10px_rgba(34,197,94,0.05)]';
+      case 'medium': return isSelected ? 'bg-yellow-300 text-stone-950 shadow-[0_0_14px_rgba(250,204,21,0.22)]' : 'bg-yellow-50 text-yellow-800 hover:bg-yellow-100 shadow-[0_0_10px_rgba(250,204,21,0.05)]';
+      case 'low': return isSelected ? 'bg-rose-500 text-white shadow-[0_0_14px_rgba(251,113,133,0.22)]' : 'bg-rose-50 text-rose-700 hover:bg-rose-100 shadow-[0_0_10px_rgba(251,113,133,0.05)]';
       default: return 'bg-stone-100 text-stone-600';
     }
   };
@@ -76,9 +76,9 @@ export function TokenHeatmap({ tokens }: TokenHeatmapProps) {
     <div className="flex flex-col gap-2">
       {/* Action Row */}
       <div className="flex justify-between items-center px-1">
-        <div className="text-xs text-stone-500 flex items-center gap-2">
+        <div className="text-[11px] text-stone-500 flex items-center gap-2">
           {lockedTokenIndex !== null ? (
-            <span className="flex items-center gap-1 text-[#9a3412]"><Lock className="w-3 h-3" /> Token locked</span>
+            <span className="flex items-center gap-1 text-[#8f3d20]"><Lock className="w-3 h-3" /> Token locked</span>
           ) : (
             <span className="flex items-center gap-1"><Unlock className="w-3 h-3" /> Hover active</span>
           )}
@@ -87,13 +87,13 @@ export function TokenHeatmap({ tokens }: TokenHeatmapProps) {
           <div className="flex bg-white border border-stone-200 rounded-xl p-0.5 shadow-sm">
              <button 
                 onClick={() => setMode('confidence')}
-                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition ${mode === 'confidence' ? 'bg-stone-900 text-white' : 'text-stone-500 hover:text-stone-900'}`}
+                className={`px-2 py-1 rounded-lg text-[9.5px] font-bold uppercase tracking-wider transition ${mode === 'confidence' ? 'bg-stone-800 text-white' : 'text-stone-500 hover:text-stone-900'}`}
              >
                 Confidence
              </button>
              <button 
                 onClick={() => setMode('entropy')}
-                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition ${mode === 'entropy' ? 'bg-[#d97757]/10 text-[#9a3412]' : 'text-stone-500 hover:text-stone-900'}`}
+                className={`px-2 py-1 rounded-lg text-[9.5px] font-bold uppercase tracking-wider transition ${mode === 'entropy' ? 'bg-[#b96b4e]/8 text-[#8f3d20]' : 'text-stone-500 hover:text-stone-900'}`}
              >
                 Entropy
              </button>
@@ -120,7 +120,7 @@ export function TokenHeatmap({ tokens }: TokenHeatmapProps) {
          </div>
       ) : (
         <div 
-          className="p-4 bg-white/70 rounded-2xl border border-stone-200 flex flex-wrap content-start leading-8 overflow-y-auto relative"
+          className="p-3 bg-white/68 rounded-xl border border-stone-200/90 flex flex-wrap content-start leading-7 overflow-y-auto relative"
           style={{ maxHeight: '75vh' }}
           onMouseLeave={handleMouseLeave}
         >
@@ -135,9 +135,9 @@ export function TokenHeatmap({ tokens }: TokenHeatmapProps) {
                 title={`Probability: ${formatPercent(token.probability)} | Rank: ${token.rank === 0 ? 'Top' : `#${token.rank + 1}`} | Entropy: ${token.entropy.toFixed(3)} | Alternatives: ${token.top_logprobs.slice(0, 4).map(a => `${a.token.trim() || 'space'} ${formatPercent(a.probability)}`).join(', ')}`}
                 style={{ animationDelay: `${Math.min(idx, 40) * 10}ms` }}
                 className={cn(
-                  "token-fade-in inline-block px-2 py-0.5 rounded-xl font-mono text-[14px] transition-all duration-200 relative cursor-pointer m-px border border-white/70",
+                  "token-fade-in inline-block px-1.5 py-0.5 rounded-lg font-mono text-[13px] transition-all duration-200 relative cursor-pointer m-px border border-white/70",
                   getColor(token, isSelected),
-                  isSelected && 'z-10 scale-110 ring-1 ring-[#d97757]/30'
+                  isSelected && 'z-10 scale-105 ring-1 ring-[#b96b4e]/25'
                 )}
               >
                 {token.rank > 0 && (
@@ -157,7 +157,7 @@ export function TokenHeatmap({ tokens }: TokenHeatmapProps) {
         <div className="premium-card border-sky-300/20 p-3 text-sm shadow-2xl flex flex-col gap-1 transition-opacity animate-in-soft">
            <div className="flex justify-between items-center mb-1">
              <span className="text-stone-500 text-xs font-bold uppercase tracking-wide">Hover Preview</span>
-             <span className="text-[#9a3412] font-mono">{formatPercent(previewToken.probability)}</span>
+             <span className="text-[#8f3d20] font-mono">{formatPercent(previewToken.probability)}</span>
            </div>
             <div className="text-stone-900">
               <span className="font-mono bg-stone-100 border border-stone-200 px-2 rounded">"{previewToken.token}"</span>

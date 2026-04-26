@@ -16,10 +16,10 @@ export function MessageBlock({ content }: MessageBlockProps) {
     <div className="markdown-prose prose-sm md:prose-base 
                     prose-headings:font-semibold prose-headings:text-stone-900 prose-headings:mt-6 prose-headings:mb-3
                     prose-p:text-stone-800 prose-p:leading-relaxed prose-p:my-3
-                    prose-a:text-[#9a3412] hover:prose-a:text-[#7c2d12] prose-a:no-underline hover:prose-a:underline
+                    prose-a:text-[#8f3d20] hover:prose-a:text-[#6f2f18] prose-a:no-underline hover:prose-a:underline
                     prose-strong:text-stone-900 prose-strong:font-semibold 
                     prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 prose-li:my-1 prose-li:text-stone-800
-                    prose-blockquote:border-l-4 prose-blockquote:border-[#d97757]/50 prose-blockquote:bg-[#d97757]/5 prose-blockquote:py-2 prose-blockquote:px-5 prose-blockquote:rounded-r-xl prose-blockquote:not-italic prose-blockquote:text-stone-700 prose-blockquote:my-4
+                    prose-blockquote:border-l-4 prose-blockquote:border-[#b96b4e]/35 prose-blockquote:bg-[#b96b4e]/5 prose-blockquote:py-2 prose-blockquote:px-5 prose-blockquote:rounded-r-xl prose-blockquote:not-italic prose-blockquote:text-stone-700 prose-blockquote:my-4
                     break-word whitespace-pre-wrap 
                     prose-pre:bg-[#2b2926] prose-pre:border prose-pre:border-stone-300 prose-pre:overflow-x-auto prose-pre:whitespace-pre prose-pre:shadow-md prose-pre:rounded-xl prose-pre:my-6
                     prose-code:font-mono prose-code:before:content-none prose-code:after:content-none"
@@ -38,7 +38,7 @@ export function MessageBlock({ content }: MessageBlockProps) {
             }
             
             return (
-              <code className="bg-[#d97757]/10 text-[#9a3412] px-1.5 py-0.5 rounded-md text-[13px] border border-[#d97757]/20" {...props}>
+              <code className="bg-[#b96b4e]/8 text-[#8f3d20] px-1.5 py-0.5 rounded-md text-[13px] border border-[#b96b4e]/18" {...props}>
                 {children}
               </code>
             );

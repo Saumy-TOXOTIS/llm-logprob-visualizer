@@ -13,3 +13,7 @@
  POST /api/llamacpp 200 in 563ms
  POST /api/llamacpp 200 in 22ms
  ✓ Compiled in 179ms
+ ○ Compiling / ...
+ ✓ Compiled / in 4.4s (1695 modules)
+ HEAD / 200 in 5078ms
+ ✓ Compiled in 779ms (838 modules)
