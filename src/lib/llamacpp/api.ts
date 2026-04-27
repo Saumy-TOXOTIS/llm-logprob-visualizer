@@ -24,6 +24,21 @@ function computeEntropy(probs: number[]): number {
   }, 0);
 }
 
+function applyLlamaSamplingSettings(payload: any, settings: ChatSettings) {
+  payload.temperature = settings.temperature;
+  payload.top_p = settings.top_p;
+
+  if (settings.top_k !== undefined) payload.top_k = settings.top_k;
+  if (settings.min_p !== undefined) payload.min_p = settings.min_p;
+  if (settings.presence_penalty !== undefined) payload.presence_penalty = settings.presence_penalty;
+  if (settings.frequency_penalty !== undefined) payload.frequency_penalty = settings.frequency_penalty;
+  if (settings.repeat_penalty !== undefined) payload.repeat_penalty = settings.repeat_penalty;
+  if (settings.seed !== undefined) payload.seed = settings.seed;
+  if (settings.stop && settings.stop.length > 0) payload.stop = settings.stop;
+
+  return payload;
+}
+
 function messageHasImages(message: Message) {
   return !!message.images && message.images.length > 0;
 }
@@ -215,19 +230,11 @@ async function sendMultimodalMessageToLlamaCpp(
   const payload: any = {
     model,
     messages,
-    temperature: settings.temperature,
-    top_p: settings.top_p,
     stream: false,
     max_tokens: settings.max_output_tokens || 2048
   };
 
-  if (settings.top_k !== undefined) payload.top_k = settings.top_k;
-  if (settings.min_p !== undefined) payload.min_p = settings.min_p;
-  if (settings.presence_penalty !== undefined) payload.presence_penalty = settings.presence_penalty;
-  if (settings.frequency_penalty !== undefined) payload.frequency_penalty = settings.frequency_penalty;
-  if (settings.repeat_penalty !== undefined) payload.repeat_penalty = settings.repeat_penalty;
-  if (settings.seed !== undefined) payload.seed = settings.seed;
-  if (settings.stop && settings.stop.length > 0) payload.stop = settings.stop;
+  applyLlamaSamplingSettings(payload, settings);
   if (settings.top_logprobs && settings.top_logprobs > 0) {
     payload.logprobs = true;
     payload.top_logprobs = settings.top_logprobs;
@@ -265,8 +272,6 @@ export async function sendMessageToLlamaCpp(
   const payload: any = {
     prompt,
     n_predict: settings.max_output_tokens || 2048,
-    temperature: settings.temperature,
-    top_p: settings.top_p,
     stream: false,
     cache_prompt: true,
     return_tokens: true,
@@ -274,13 +279,7 @@ export async function sendMessageToLlamaCpp(
     n_probs: Math.max(0, settings.top_logprobs || 0)
   };
 
-  if (settings.top_k !== undefined) payload.top_k = settings.top_k;
-  if (settings.min_p !== undefined) payload.min_p = settings.min_p;
-  if (settings.presence_penalty !== undefined) payload.presence_penalty = settings.presence_penalty;
-  if (settings.frequency_penalty !== undefined) payload.frequency_penalty = settings.frequency_penalty;
-  if (settings.repeat_penalty !== undefined) payload.repeat_penalty = settings.repeat_penalty;
-  if (settings.seed !== undefined) payload.seed = settings.seed;
-  if (settings.stop && settings.stop.length > 0) payload.stop = settings.stop;
+  applyLlamaSamplingSettings(payload, settings);
 
   const rawJson = await callLlamaCpp(baseUrl, '/completion', payload);
   const parsed = parseLmStudioResponse(rawJson, settings);
@@ -336,21 +335,13 @@ export async function fetchFullVocabSnapshot({
   const payload: any = {
     prompt: completionPrompt,
     n_predict: 1,
-    temperature: settings.temperature,
-    top_p: settings.top_p,
     n_probs: nProbs,
     post_sampling_probs: settings.fullVocabPostSampling ?? false,
     return_tokens: true,
     cache_prompt: true
   };
 
-  if (settings.top_k !== undefined) payload.top_k = settings.top_k;
-  if (settings.min_p !== undefined) payload.min_p = settings.min_p;
-  if (settings.presence_penalty !== undefined) payload.presence_penalty = settings.presence_penalty;
-  if (settings.frequency_penalty !== undefined) payload.frequency_penalty = settings.frequency_penalty;
-  if (settings.repeat_penalty !== undefined) payload.repeat_penalty = settings.repeat_penalty;
-  if (settings.seed !== undefined) payload.seed = settings.seed;
-  if (settings.stop && settings.stop.length > 0) payload.stop = settings.stop;
+  applyLlamaSamplingSettings(payload, settings);
 
   const data = await callLlamaCpp(baseUrl, '/completion', payload);
   const probabilityBlock = data?.completion_probabilities?.[0];
